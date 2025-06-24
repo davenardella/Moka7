@@ -1,0 +1,33 @@
+====================================================================[2016-12-15]
+Version 1.0.2 - Bugfix release
+================================================================================
+[Fixed]
+- A bug in the connection that could have caused an incorrect deallocation of 
+  resources
+  Thanks to Luca Domenichini
+
+[Changed]
+- The license, now Moka7 is released under dual license : LGPL3 and EPL 1.0
+
+
+====================================================================[2014-06-05]
+Version 1.0.1 - Bugfix release
+================================================================================
+
+[Added]
+- An Eclipse Android demo (Moka7AndroidExample)
+  Thanks to Angelo Rottigni
+
+[Fixed]
+- Some typo errors
+  Thanks to Angelo Rottigni and Lionel Mazeyrat
+
+
+
+====================================================================[2014-04-18]
+Version 1.0.0
+================================================================================
+
+2014/04/18 + First public release.
+
+================================================================================
