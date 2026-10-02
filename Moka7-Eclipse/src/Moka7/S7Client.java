@@ -55,6 +55,9 @@ public class S7Client
     public static final int errS7BufferTooSmall    = 0x000C;
     public static final int errS7FunctionError     = 0x000D;
     public static final int errS7InvalidParams     = 0x000E;           
+    // additional Error Codes
+    public static final int errS7WaitForDataInterupted    = 0x0010;
+    public static final int errS7ExpectedDataNotReceived  = 0x0011; 
     
     // Public fields
     public boolean Connected = false;
@@ -347,6 +350,10 @@ public class S7Client
                 return "S7 function refused by the CPU.";
             case errS7InvalidParams :
                 return "Invalid parameters supplied to the function.";
+            case errS7WaitForDataInterupted :
+                return "Interrupted while waiting for TCP data.";
+            case errS7ExpectedDataNotReceived :
+                return "Data Receiving timeout (Not all expected TCP Data received.).";
             default : 
                 return "Unknown error : 0x"+Integer.toHexString(Error);
         }
@@ -386,13 +393,15 @@ public class S7Client
                     Thread.sleep(1);
                 } 
                 catch (InterruptedException ex) {
-                    LastError=errTCPDataRecvTout;
+                    LastError=errS7WaitForDataInterupted;
                 }
                 SizeAvail=InStream.available();              
                 Expired=cnt>Timeout;
                 // If timeout we clean the buffer
-                if (Expired && (SizeAvail>0) && (LastError==0))
-                  InStream.read(PDU, 0, SizeAvail);
+                if (Expired && (SizeAvail>0) && (LastError==0)){
+                    InStream.read(PDU, 0, SizeAvail);
+                    LastError = errS7ExpectedDataNotReceived;
+                  }
             }
         } 
         catch (IOException ex) 
@@ -863,7 +872,20 @@ public class S7Client
         }
         return LastError;
     }  
-    
+
+    public int DBget(int DBNumber, byte[] Buffer, int SizeToRead, IntByRef SizeRead){
+        // Checks the room
+        if (SizeToRead<=Buffer.length)
+        {
+            LastError=ReadArea(S7.S7AreaDB, DBNumber, 0, SizeToRead, Buffer);
+            if (LastError==0)
+                SizeRead.Value=SizeToRead;
+        }
+        else
+            LastError=errS7BufferTooSmall;
+        return LastError;
+    }
+
     public int ReadSZL(int ID, int Index, S7Szl SZL)
     {
     	int Length;
@@ -1209,6 +1231,10 @@ public class S7Client
             Protection.Update(SZL.Data);
         }
         return LastError;
+    }
+    
+    public String getErrorText(){
+    	return ErrorText( LastError );
     }
     
 }
