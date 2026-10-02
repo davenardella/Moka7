@@ -872,7 +872,20 @@ public class S7Client
         }
         return LastError;
     }  
-    
+
+    public int DBget(int DBNumber, byte[] Buffer, int SizeToRead, IntByRef SizeRead){
+        // Checks the room
+        if (SizeToRead<=Buffer.length)
+        {
+            LastError=ReadArea(S7.S7AreaDB, DBNumber, 0, SizeToRead, Buffer);
+            if (LastError==0)
+                SizeRead.Value=SizeToRead;
+        }
+        else
+            LastError=errS7BufferTooSmall;
+        return LastError;
+    }
+
     public int ReadSZL(int ID, int Index, S7Szl SZL)
     {
     	int Length;
